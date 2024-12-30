@@ -68,6 +68,8 @@
         "stack": "cpp",
         "typeindex": "cpp",
         "unordered_set": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "memory": "cpp",
+        "print": "cpp"
     }
 }
