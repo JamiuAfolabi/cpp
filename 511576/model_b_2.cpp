@@ -1,118 +1,109 @@
 #include <iostream>
 #include <string>
-#include <vector>
-using namespace std;
 
-// Function to initialize the s-box using a provided key
-vector<int> initializeSBox(vector<int> s, vector<int> key);
+class LoanService {
+public:
+    enum LoanType {
+        CAR_LOAN,
+        HOUSE_LOAN
+    };
 
-// Function to obfuscate the BVN (Bank Verification Number)
-string obfuscateBVN(vector<int> s, vector<int> key, string bvn);
+    enum FeePaymentOption {
+        UPFRONT,
+        ROLL_INTO_LOAN
+    };
 
-// Function to deobfuscate the BVN
-string deobfuscateBVN(vector<int> s, vector<int> key, string bvn);
+    double calculateLoanFee(LoanType loanType, double loanAmount) {
+        switch (loanType) {
+            case CAR_LOAN:
+                return loanAmount * 0.015;
+            case HOUSE_LOAN:
+                return loanAmount * 0.03;
+            default:
+                return 0.0;
+        }
+    }
+
+    double calculateMonthlyPayment(double loanAmount, double interestRate, int loanTermInMonths, FeePaymentOption feePaymentOption, double loanFee) {
+        double interestRatePerMonth = interestRate / 1200;
+        double totalLoanAmount = loanAmount;
+
+        if (feePaymentOption == FeePaymentOption::ROLL_INTO_LOAN) {
+            totalLoanAmount += loanFee;
+        }
+
+        double monthlyPayment = totalLoanAmount * interestRatePerMonth * std::pow(1 + interestRatePerMonth, loanTermInMonths) /
+                               (std::pow(1 + interestRatePerMonth, loanTermInMonths) - 1);
+
+        return monthlyPayment;
+    }
+};
 
 int main() {
+    LoanService loanService;
+    LoanService::LoanType loanType;
+    LoanService::FeePaymentOption feePaymentOption;
 
-    string bvn = "1234567890123456";  // Example BVN
-    vector<int> S(256); // s-box initialization vector
-    vector<int> key = {
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-        33, 34, 35, 36, 37, 38, 39, 40
-    }; // Example key of length 40 bytes
+    double loanPrincipal, interestRate, loanTermInYears, loanFee;
 
-    // Initialize the s-box with the key
-    S = initializeSBox(S, key);
+    std::cout << "Loan Type:\n"
+              << "1. Car Loan\n"
+              << "2. House Loan\n"
+              << "Please choose a loan type (1/2): ";
+    int choice;
+    std::cin >> choice;
+    while (choice < 1 || choice > 2) {
+        std::cout << "Invalid choice. Please select again (1/2): ";
+        std::cin >> choice;
+    }
 
-    // Obfuscate and deobfuscate the BVN
-    string obfuscatedBVN = obfuscateBVN(S, key, bvn);
-    string deobfuscatedBVN = deobfuscateBVN(S, key, obfuscatedBVN);
+    switch (choice) {
+        case 1:
+            loanType = LoanService::CAR_LOAN;
+            break;
+        case 2:
+            loanType = LoanService::HOUSE_LOAN;
+            break;
+    }
 
-    // Print the results
-    cout << "Original BVN: " << bvn << endl;
-    cout << "Obfuscated BVN: " << obfuscatedBVN << endl;
-    cout << "Deobfuscated BVN: " << deobfuscatedBVN << endl;
+    std::cout << "Enter loan principal: $";
+    std::cin >> loanPrincipal;
+
+    std::cout << "Enter annual interest rate (e.g., 5 for 5%): ";
+    std::cin >> interestRate;
+
+    std::cout << "Enter loan term in years: ";
+    std::cin >> loanTermInYears;
+
+    std::cout << "Pay loan fee:\n"
+              << "1. Upfront\n"
+              << "2. Roll it into the loan amount\n"
+              << "Please choose an option (1/2): ";
+    std::cin >> choice;
+    while (choice < 1 || choice > 2) {
+        std::cout << "Invalid choice. Please select again (1/2): ";
+        std::cin >> choice;
+    }
+
+    switch (choice) {
+        case 1:
+            feePaymentOption = LoanService::FeePaymentOption::UPFRONT;
+            break;
+        case 2:
+            feePaymentOption = LoanService::FeePaymentOption::ROLL_INTO_LOAN;
+            break;
+    }
+
+    loanFee = loanService.calculateLoanFee(loanType, loanPrincipal);
+
+    std::cout << "Loan Fee: $" << loanFee << std::endl;
+
+    int loanTermInMonths = loanTermInYears * 12;
+
+    double monthlyPayment = loanService.calculateMonthlyPayment(
+            loanPrincipal, interestRate, loanTermInMonths, feePaymentOption, loanFee);
+
+    std::cout << "Monthly Payment: $" << monthlyPayment << std::endl;
 
     return 0;
-}
-
-string deobfuscateBVN(vector<int> s, vector<int> key, string bvn) {
-    int i = 0, j = 0, tmp = 0, k = 0;
-    int b;
-    int c;
-    int * plain = new int[bvn.length()];
-    string plain_T;
-
-    // Deobfuscation process
-    for (int r = 0; r < bvn.length(); r++) {
-        i = (i + 1) % 256;
-        j = (j + s[i]) % 256;
-
-        // Swap section
-        b = s[i];
-        s[i] = s[j];
-        s[j] = b;
-
-        tmp = (s[i] + s[j]) % 256;
-        k = s[tmp];
-
-        c = ((int)bvn[r] ^ k);  // XOR with the generated key
-
-        plain[r] = c;
-
-        plain_T += (char)plain[r];  // Convert int array to char and append to the output string
-    }
-    return plain_T;
-}
-
-string obfuscateBVN(vector<int> s, vector<int> key, string bvn) {
-    int i = 0, j = 0, tmp = 0, k = 0;
-    int b;
-    int c;
-    int * cipher = new int[bvn.length()];
-    string cipher_T;
-
-    // Obfuscation process
-    for (int r = 0; r < bvn.length(); r++) {
-        i = (i + 1) % 256;
-        j = (j + s[i]) % 256;
-
-        // Swap section
-        b = s[i];
-        s[i] = s[j];
-        s[j] = b;
-
-        tmp = (s[i] + s[j]) % 256;
-        k = s[tmp];
-
-        c = ((int)bvn[r] ^ k);  // XOR the BVN character with the key
-
-        cipher[r] = c;
-
-        cipher_T += (char)cipher[r];  // Convert int to char and append to the output string
-    }
-
-    return cipher_T;
-}
-
-vector<int> initializeSBox(vector<int> s, vector<int> key) {
-    int b = 0, tmp;
-    int keyIndex = 0;
-
-    // Initialize the s-box with values from 0 to 255
-    for (int a = 0; a < 256; a++) {
-        s[a] = a;
-    }
-
-    // Perform the key scheduling to generate the s-box
-    for (int a = 0; a < 256; a++) {
-        b = (b + s[a] + key[keyIndex % key.size()]) % 256;
-        keyIndex++;
-        tmp = s[a];
-        s[a] = s[b];
-        s[b] = tmp;
-    }
-
-    return s;
 }

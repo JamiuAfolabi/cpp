@@ -1,171 +1,95 @@
 #include <iostream>
-#include <string>
-#include <vector>
-#include <random>
-#include <CommonCrypto/CommonDigest.h>
-#include <thread>
-#include <mutex>
-#include <queue>
-#include <condition_variable>
+#include <cmath>
+#include <functional>
 
-using namespace std;
+template <typename LoanType>
+class LoanCalculator {
+public:
+    LoanCalculator() {
+        loanFeeCalculator = [this](double loanAmount) {
+            return calculateLoanFee(loanAmount);
+        };
+    }
 
-// Function to initialize the s-box using a provided key
-vector<int> initializeSBox(vector<int> s, const vector<char>& key);
+    virtual double calculateLoanFee(double loanAmount) = 0;
 
-// Function to obfuscate a single batch of data
-string obfuscateBatch(vector<int> s, const vector<char>& key, const vector<string>& batch);
+    std::function<double(double)> loanFeeCalculator;
+};
 
-// Function to deobfuscate a single batch of data
-vector<string> deobfuscateBatch(vector<int> s, const vector<char>& key, const vector<string>& batch);
+class CarLoanCalculator : public LoanCalculator<CarLoanCalculator> {
+public:
+    double calculateLoanFee(double loanAmount) override {
+        return loanAmount * 0.015; // 1.5% for car loans
+    }
+};
 
-// Function to generate a random key of specified length
-vector<char> generateRandomKey(size_t length);
+class HouseLoanCalculator : public LoanCalculator<HouseLoanCalculator> {
+public:
+    double calculateLoanFee(double loanAmount) override {
+        return loanAmount * 0.03; // 3% for house loans
+    }
+};
 
-// Function to hash a string using SHA-256 (CommonCrypto)
-string hashSHA256(const string& input);
+class LoanService {
+public:
+    template <typename LoanCalcType>
+    double calculateLoanFee(double loanAmount, LoanCalcType& loanCalc) {
+        return loanCalc.loanFeeCalculator(loanAmount);
+    }
 
-// Function to process batches of data in parallel using threads
-void processBatches(vector<int> s, const vector<char>& key, const vector<vector<string>>& batches, vector<vector<string>>& deobfuscatedBatches, mutex& mtx, condition_variable& cv, bool& done);
+    template <typename LoanCalcType>
+    double calculateMonthlyPayment(double principal, double annualInterestRate, int loanTermMonths, LoanCalcType& loanCalc) {
+        double monthlyInterestRate = annualInterestRate / 12 / 100;
+        if (monthlyInterestRate == 0) {
+            return principal / loanTermMonths;
+        }
+        return (principal * monthlyInterestRate) / (1 - pow(1 + monthlyInterestRate, -loanTermMonths));
+    }
+};
 
 int main() {
-    const size_t batchSize = 100;  // Define the batch size
-    size_t numBatches = 1000;  // Define the number of batches
-    vector<int> S(256); // s-box initialization vector
+    LoanService loanService;
 
-    // Generate a random key of 16 bytes (128 bits)
-    vector<char> key = generateRandomKey(16);
+    double loanAmount, annualInterestRate;
+    int loanTermMonths, feeOption;
 
-    // Initialize the s-box with the key
-    S = initializeSBox(S, key);
+    std::cout << "Enter the amount of the loan: ";
+    std::cin >> loanAmount;
 
-    // Create vectors to hold batches of data and their corresponding deobfuscated results
-    vector<vector<string>> batches(numBatches);
-    vector<vector<string>> deobfuscatedBatches(numBatches);
+    std::cout << "Enter the annual interest rate (in %): ";
+    std::cin >> annualInterestRate;
 
-    // Generate dummy data for testing purposes
-    for (size_t i = 0; i < numBatches; ++i) {
-        for (size_t j = 0; j < batchSize; ++j) {
-            string bvn = "1234567890123456"; // Example BVN
-            batches[i].push_back(bvn);
-        }
+    std::cout << "Enter the loan term (in months): ";
+    std::cin >> loanTermMonths;
+
+    int loanType;
+    std::cout << "Select loan type:\n1. Car Loan\n2. House Loan\nChoose (1/2): ";
+    std::cin >> loanType;
+
+    CarLoanCalculator carLoanCalc;
+    HouseLoanCalculator houseLoanCalc;
+
+    LoanCalculator<>* loanCalcPtr;
+
+    if (loanType == 1) {
+        loanCalcPtr = &carLoanCalc;
+    } else {
+        loanCalcPtr = &houseLoanCalc;
     }
 
-    // Create threads to process the batches in parallel
-    mutex mtx;
-    condition_variable cv;
-    bool done = false;
-    const int numThreads = 4;  // Define the number of threads
-    vector<thread> threads;
-    for (int i = 0; i < numThreads; ++i) {
-        threads.emplace_back([&] {
-            processBatches(S, key, batches, deobfuscatedBatches, mtx, cv, done);
-        });
+    double loanFee = loanService.calculateLoanFee(loanAmount, *loanCalcPtr);
+    std::cout << "Loan Origination Fee: $" << loanFee << std::endl;
+
+    std::cout << "Do you want to pay the loan fee upfront or roll it into the loan?\n1. Pay upfront\n2. Roll into loan\nChoose (1/2): ";
+    std::cin >> feeOption;
+
+    double principal = loanAmount;
+    if (feeOption == 2) {
+        principal += loanFee;
     }
 
-    // Wait for all threads to finish
-    for (thread& t : threads) {
-        t.join();
-    }
-
-    // Perform hash verification for each batch
-    for (size_t i = 0; i < numBatches; ++i) {
-        for (size_t j = 0; j < batchSize; ++j) {
-            string originalBvn = batches[i][j];
-            string deobfuscatedBvn = deobfuscatedBatches[i][j];
-
-            string originalHash = hashSHA256(originalBvn);
-            string deobfuscatedHash = hashSHA256(deobfuscatedBvn);
-
-            bool isVerified = compareHashes(originalHash, deobfuscatedHash);
-
-            // Print the results
-            cout << "Original BVN: " << originalBvn << endl;
-            cout << "Deobfuscated BVN: " << deobfuscatedBvn << endl;
-            cout << "Hashes match: " << (isVerified ? "Yes" : "No") << endl;
-        }
-    }
+    double monthlyPayment = loanService.calculateMonthlyPayment(principal, annualInterestRate, loanTermMonths, *loanCalcPtr);
+    std::cout << "Monthly Payment: $" << monthlyPayment << std::endl;
 
     return 0;
-}
-
-vector<char> generateRandomKey(size_t length) {
-    vector<char> key(length);
-    random_device rd;
-    mt19937 generator(rd());
-    uniform_int_distribution<> distribution(0, 255);
-
-    for (size_t i = 0; i < length; ++i) {
-        key[i] = static_cast<char>(distribution(generator));
-    }
-    return key;
-}
-
-vector<int> initializeSBox(vector<int> s, const vector<char>& key) {
-    int b = 0;
-    for (int a = 0; a < 256; a++) {
-        s[a] = a;
-    }
-    for (int a = 0; a < 256; a++) {
-        b = (b + s[a] + key[a % key.size()]) % 256;
-        swap(s[a], s[b]);
-    }
-    return s;
-}
-
-string obfuscateBatch(vector<int> s, const vector<char>& key, const vector<string>& batch) {
-    vector<string> obfuscatedBatch;
-    for (const string& bvn : batch) {
-        string obfuscatedBVN = obfuscateBVN(s, key, bvn);
-        obfuscatedBatch.push_back(obfuscatedBVN);
-    }
-    return obfuscatedBatch;
-}
-
-vector<string> deobfuscateBatch(vector<int> s, const vector<char>& key, const vector<string>& batch) {
-    vector<string> deobfuscatedBatch;
-    for (const string& obfuscatedBVN : batch) {
-        string deobfuscatedBVN = deobfuscateBVN(s, key, obfuscatedBVN);
-        deobfuscatedBatch.push_back(deobfuscatedBVN);
-    }
-    return deobfuscatedBatch;
-}
-
-string hashSHA256(const string& input) {
-    unsigned char hash[CC_SHA256_DIGEST_LENGTH];
-    CC_SHA256(input.c_str(), static_cast<CC_LONG>(input.length()), hash);
-
-    stringstream hexHash;
-    for (int i = 0; i < CC_SHA256_DIGEST_LENGTH; ++i) {
-        hexHash << hex << setw(2) << setfill('0') << (int)hash[i];
-    }
-    return hexHash.str();
-}
-
-bool compareHashes(const string& originalHash, const string& newHash) {
-    return originalHash == newHash;
-}
-
-void processBatches(vector<int> s, const vector<char>& key, const vector<vector<string>>& batches, vector<vector<string>>& deobfuscatedBatches, mutex& mtx, condition_variable& cv, bool& done) {
-    while (!done) {
-        vector<string> batch;
-        {
-            unique_lock<mutex> lock(mtx);
-            cv.wait(lock, [&] { return !batches.empty() || done; });
-
-            if (done) {
-                return;
-            }
-
-            batch = move(batches.back());
-            batches.pop_back();
-        }
-
-        vector<string> deobfuscatedBatch = deobfuscateBatch(s, key, batch);
-        {
-            unique_lock<mutex> lock(mtx);
-            deobfuscatedBatches.push_back(move(deobfuscatedBatch));
-            cv.notify_one();
-        }
-    }
 }

@@ -1,76 +1,58 @@
+
 #include <iostream>
 #include <string>
-#include <vector>
-
 using namespace std;
 
-// RC4 encryption/decryption function (based on the Wikipedia pseudo-code)
-void RC4(vector<unsigned char>& data, const string& key) {
-    const size_t data_size = data.size();
-    const size_t key_size = key.size();
+class Loan {
+public:
+    enum class LoanType { CAR, HOUSE };
+    Loan(LoanType type, double amount) : type(type), amount(amount) {}
 
-    vector<unsigned char> S(256);
-    unsigned char j = 0;
-
-    // Initialization
-    for (unsigned char i = 0; i < 256; ++i) {
-        S[i] = i;
+    virtual double calculateFee() const {
+        switch (type) {
+            case LoanType::CAR:
+                return calculateCarLoanFee();
+            case LoanType::HOUSE:
+                return calculateHouseLoanFee();
+        }
     }
 
-    for (unsigned char i = 0; i < 256; ++i) {
-        j = (j + S[i] + key[i % key_size]) % 256;
-        swap(S[i], S[j]);
+protected:
+    LoanType type;
+    double amount;
+
+    double calculateCarLoanFee() const {
+        return amount * 0.015;
     }
 
-    // Encryption/decryption
-    j = 0;
-    for (unsigned char i = 0; i < data_size; ++i) {
-        j = (j + S[i]) % 256;
-        swap(S[i], S[j]);
-        const unsigned char k = (S[i] + S[j]) % 256;
-        data[i] ^= S[k];
+    double calculateHouseLoanFee() const {
+        return amount * 0.03;
     }
-}
+};
 
-string obfuscateBVN(const string& bvn, const string& key) {
-    vector<unsigned char> bvnData(bvn.begin(), bvn.end());
+class CarLoan : public Loan {
+public:
+    CarLoan(double amount) : Loan(LoanType::CAR, amount) {}
+};
 
-    RC4(bvnData, key);
-
-    // Convert encrypted data back to string
-    string obfuscatedBVN;
-    for (const unsigned char& c : bvnData) {
-        obfuscatedBVN.push_back(static_cast<char>(c));
-    }
-
-    return obfuscatedBVN;
-}
-
-string deObfuscateBVN(const string& obfuscatedBVN, const string& key) {
-    vector<unsigned char> obfuscatedData(obfuscatedBVN.begin(), obfuscatedBVN.end());
-
-    RC4(obfuscatedData, key);
-
-    // Convert decrypted data back to string
-    string deObfuscatedBVN;
-    for (const unsigned char& c : obfuscatedData) {
-        deObfuscatedBVN.push_back(static_cast<char>(c));
-    }
-
-    return deObfuscatedBVN;
-}
+class HouseLoan : public Loan {
+public:
+    HouseLoan(double amount) : Loan(LoanType::HOUSE, amount) {}
+};
 
 int main() {
-    string bvnToObfuscate = "1234567890";
-    string encryptionKey = "your_secret_encryption_key";  // Replace this with a strong, random key
+    double carLoanAmount = 20000;
+    double houseLoanAmount = 500000;
 
-    // Obfuscate BVN
-    string obfuscatedBVN = obfuscateBVN(bvnToObfuscate, encryptionKey);
-    cout << "Obfuscated BVN: " << obfuscatedBVN << endl;
+    CarLoan carLoan(carLoanAmount);
+    HouseLoan houseLoan(houseLoanAmount);
 
-    // De-obfuscate BVN
-    string deObfuscatedBVN = deObfuscateBVN(obfuscatedBVN, encryptionKey);
-    cout << "De-obfuscated BVN: " << deObfuscatedBVN << endl;
+    double carLoanFee = carLoan.calculateFee();
+    double houseLoanFee = houseLoan.calculateFee();
+
+    cout << "Loan Fee for Car Loan of $" << carLoanAmount << ": $" << carLoanFee << endl;
+    cout << "Loan Fee for House Loan of $" << houseLoanAmount << ": $" << houseLoanFee << endl;
 
     return 0;
 }
+

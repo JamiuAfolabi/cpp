@@ -1,75 +1,77 @@
 #include <iostream>
+#include <cmath>
 #include <string>
-#include <vector>
-#include <cstring>
-#include <Foundation/Foundation.h>
 
-using namespace std;
+class LoanService {
+public:
+    enum LoanType {
+        CAR_LOAN,
+        HOUSE_LOAN
+    };
 
-vector<int> initializeSBox(vector<int> s, const vector<char>& key);
-string obfuscateBVN(vector<int> s, const vector<char>& key, const string& bvn);
-string deobfuscateBVN(vector<int> s, const vector<char>& key, const string& bvn);
-vector<char> generateRandomKey(size_t length);
+    using FeeCalculationFunc = double (*)(LoanService&, double loanAmount);
+    FeeCalculationFunc feeCalculationFuncs[2] = {calculateCarLoanFee, calculateHouseLoanFee};
 
-// Function to calculate SHA-256 hash of a string using CommonCrypto
-string calculateSHA256(const string& data) {
-    const char *cstr = data.c_str();
-    uint8_t digest[CC_SHA256_DIGEST_LENGTH];
-    CC_SHA256(cstr, static_cast<uint32_t>(data.length()), digest);
-
-    char hash[CC_SHA256_DIGEST_LENGTH * 2];
-    for (int i = 0; i < CC_SHA256_DIGEST_LENGTH; i++) {
-        sprintf(hash + i * 2, "%02hhx", digest[i]);
+    // Loan fee calculation functions
+    double calculateCarLoanFee(double loanAmount) {
+        return loanAmount * 0.015; // 1.5% for car loans
     }
 
-    return string(hash);
-}
+    double calculateHouseLoanFee(double loanAmount) {
+        return loanAmount * 0.03; // 3% for house loans
+    }
 
-bool verifySHA256(const string& data, const string& expectedHash) {
-    string actualHash = calculateSHA256(data);
-    return actualHash == expectedHash;
-}
-
+    // Rest of the class code remains the same...
+    // Function to calculate monthly payment
+    double calculateMonthlyPayment(double principal, double annualInterestRate, int loanTermMonths) {
+        double monthlyInterestRate = annualInterestRate / 12 / 100; // Convert annual rate to monthly and percentage
+        if (monthlyInterestRate == 0) {
+            return principal / loanTermMonths; // Simple division if no interest
+        }
+        return (principal * monthlyInterestRate) / (1 - pow(1 + monthlyInterestRate, -loanTermMonths));
+    }
+};
 int main() {
-    string bvn = "1234567890123456";  // Example BVN
-    vector<int> S(256); // s-box initialization vector
+    LoanService loanService;
 
-    vector<char> key = generateRandomKey(16);
-    S = initializeSBox(S, key);
+    double loanAmount, annualInterestRate;
+    int loanTermMonths;
+    int feeOption;
 
-    string obfuscatedBVN = obfuscateBVN(S, key, bvn);
+    std::cout << "Enter the amount of the loan: ";
+    std::cin >> loanAmount;
 
-    // Calculate SHA-256 hash of the original BVN
-    string bvnHash = calculateSHA256(bvn);
-    cout << "SHA-256 Hash of Original BVN: " << bvnHash << endl;
+    std::cout << "Enter the annual interest rate (in %): ";
+    std::cin >> annualInterestRate;
 
-    // Store obfuscated data and its hash for transmission or storage
-    struct {
-        string obfuscatedData;
-        string hash;
-    } encryptedData;
-    encryptedData.obfuscatedData = obfuscatedBVN;
-    encryptedData.hash = bvnHash;
+    std::cout << "Enter the loan term (in months): ";
+    std::cin >> loanTermMonths;
 
-    // Let's assume we transmit the 'encryptedData' struct
-    // ...
+    // Loan type selection
+    int loanType;
+    std::cout << "Select loan type:\n1. Car Loan\n2. House Loan\nChoose (1/2): ";
+    std::cin >> loanType;
 
-    // Upon receiving the obfuscated data and hash
-    string receivedObfuscatedBVN = encryptedData.obfuscatedData;
-    string receivedHash = encryptedData.hash;
+    LoanService::LoanType selectedLoanType = (loanType == 1) ? LoanService::CAR_LOAN : LoanService::HOUSE_LOAN;
 
-    string deobfuscatedBVN = deobfuscateBVN(S, key, receivedObfuscatedBVN);
+    // Loan fee calculation
+    double loanFee = loanService.calculateLoanFee(selectedLoanType, loanAmount);
+    std::cout << "Loan Origination Fee: $" << loanFee << std::endl;
 
-    // Verify the integrity of the data
-    if (!verifySHA256(deobfuscatedBVN, receivedHash)) {
-        cout << "Data integrity check failed! The data has been tampered with." << endl;
-    } else {
-        cout << "Data integrity check passed." << endl;
+    // Fee payment option
+    std::cout << "Do you want to pay the loan fee upfront or roll it into the loan?\n1. Pay upfront\n2. Roll into loan\nChoose (1/2): ";
+    std::cin >> feeOption;
+
+    double principal = loanAmount;
+    if (feeOption == 2) {
+        principal += loanFee; // Roll fee into loan amount
     }
 
-    cout << "Original BVN: " << bvn << endl;
-    cout << "Obfuscated BVN: " << receivedObfuscatedBVN << endl;
-    cout << "Deobfuscated BVN: " << deobfuscatedBVN << endl;
+    // Calculate monthly payment
+    double monthlyPayment = loanService.calculateMonthlyPayment(principal, annualInterestRate, loanTermMonths);
+    
+    // Output the results
+    std::cout << "Monthly Payment: $" << monthlyPayment << std::endl;
 
     return 0;
 }

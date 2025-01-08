@@ -1,124 +1,99 @@
 #include <iostream>
-#include <string>
+#include <cmath>
+#include <functional>
 #include <vector>
-#include <thread>
-#include <mutex>
-#include <queue>
-#include <random>
-#include <condition_variable>
-#include <CommonCrypto/CommonDigest.h>
-#include <sstream>
-#include <iomanip>
 
-using namespace std;
-
-// Task Structure to hold data for worker threads
-struct Task {
-    string bvn; // BVN to encrypt or decrypt
-    vector<char> key; // Key to use for encryption/decryption
-    vector<int> S; // S-box
-};
-
-// Thread-safe queue for tasks
-class ThreadSafeQueue {
+// Template structure to handle different loan types
+template<typename LoanType>
+class LoanService {
 public:
-    void push(Task task) {
-        lock_guard<mutex> lock(mux);
-        tasks.push(task);
-        cond.notify_one();
+    // Method to calculate loan origination fee
+    double calculateLoanFee(LoanType loanType, double loanAmount) {
+        return loanType.calculateFee(loanAmount);
     }
 
-    bool pop(Task &task) {
-        lock_guard<mutex> lock(mux);
-        if (tasks.empty())
-            return false;
-        task = tasks.front();
-        tasks.pop();
-        return true;
+    // Method to calculate monthly payment
+    double calculateMonthlyPayment(double principal, double annualInterestRate, int loanTermMonths) {
+        if (loanTermMonths == 0) return 0.0; // Avoid division by zero
+        double monthlyInterestRate = annualInterestRate / 12 / 100; // Convert annual rate to monthly
+        if (monthlyInterestRate == 0) {
+            return principal / loanTermMonths; // Simple division if no interest
+        }
+        return (principal * monthlyInterestRate) / (1 - pow(1 + monthlyInterestRate, -loanTermMonths));
     }
-
-private:
-    queue<Task> tasks;
-    mutex mux;
-    condition_variable cond;
 };
 
-// Thread Pool class to manage worker threads
-class ThreadPool {
+// Abstract loan type class
+class LoanTypeBase {
 public:
-    ThreadPool(size_t numThreads) {
-        for (size_t i = 0; i < numThreads; ++i) {
-            workers.emplace_back([this] {
-                Task task;
-                while (true) {
-                    while (taskQueue.pop(task)) {
-                        // Perform work
-                        string obfuscated = obfuscateBVN(task.S, task.key, task.bvn);
-                        cout << "Obfuscated BVN: " << obfuscated << endl; // Or handle the result
-                    }
-                }
-            });
-        }
-    }
-
-    void enqueueTask(const Task &task) {
-        taskQueue.push(task);
-    }
-
-    ~ThreadPool() {
-        for (auto &worker : workers) {
-            worker.join(); // Wait for all threads to finish
-        }
-    }
-
-private:
-    vector<thread> workers;
-    ThreadSafeQueue taskQueue;
+    virtual double calculateFee(double loanAmount) const = 0; // Pure virtual function
 };
 
-// Function to obfuscate the BVN (Bank Verification Number)
-string obfuscateBVN(vector<int> s, const vector<char>& key, const string& bvn) {
-    int i = 0, j = 0, k = 0, c;
-    string cipher; // Result obfuscated BVN
-
-    for (size_t r = 0; r < bvn.length(); r++) {
-        i = (i + 1) % 256;
-        j = (j + s[i]) % 256;
-
-        // Swap section
-        swap(s[i], s[j]);
-
-        int tmp_index = (s[i] + s[j]) % 256;
-        k = s[tmp_index];
-
-        c = (static_cast<int>(bvn[r]) ^ k);
-        cipher += static_cast<char>(c);
+// Car loan type class
+class CarLoan : public LoanTypeBase {
+public:
+    double calculateFee(double loanAmount) const override {
+        return loanAmount * 0.015; // 1.5% for car loans
     }
+};
 
-    return cipher;
-}
+// House loan type class
+class HouseLoan : public LoanTypeBase {
+public:
+    double calculateFee(double loanAmount) const override {
+        return loanAmount * 0.03; // 3% for house loans
+    }
+};
 
 int main() {
-    vector<Task> tasks; // You would fill this with chunks of data/keys
-    vector<char> key = generateRandomKey(16); // Assume this generates a random key
-    vector<int> S(256); // Assume this initializes the S-box
+    LoanService<LoanTypeBase*> loanService;
 
-    // Example BVNs for processing (This would normally be done by reading from your data source)
-    vector<string> bvnList = {"1234567890123456", "6543210987654321", "1111222233334444"};
+    double loanAmount, annualInterestRate;
+    int loanTermMonths;
+    int feeOption;
 
-    for (const auto &bvn : bvnList) {
-        tasks.emplace_back(Task{bvn, key, S});
+    std::cout << "Enter the amount of the loan: ";
+    std::cin >> loanAmount;
+
+    std::cout << "Enter the annual interest rate (in %): ";
+    std::cin >> annualInterestRate;
+
+    std::cout << "Enter the loan term (in months): ";
+    std::cin >> loanTermMonths;
+
+    // Loan type selection
+    int loanType;
+    std::cout << "Select loan type:\n1. Car Loan\n2. House Loan\nChoose (1/2): ";
+    std::cin >> loanType;
+
+    LoanTypeBase* selectedLoanType = nullptr;
+    if (loanType == 1) {
+        selectedLoanType = new CarLoan();
+    } else if (loanType == 2) {
+        selectedLoanType = new HouseLoan();
     }
 
-    // Initialize the thread pool
-    size_t numThreads = thread::hardware_concurrency();
-    ThreadPool pool(numThreads);
+    // Loan fee calculation
+    double loanFee = loanService.calculateLoanFee(*selectedLoanType, loanAmount);
+    std::cout << "Loan Origination Fee: $" << loanFee << std::endl;
 
-    // Add all tasks to the thread pool
-    for (const auto &task : tasks) {
-        pool.enqueueTask(task);
+    // Fee payment option
+    std::cout << "Do you want to pay the loan fee upfront or roll it into the loan?\n1. Pay upfront\n2. Roll into loan\nChoose (1/2): ";
+    std::cin >> feeOption;
+
+    double principal = loanAmount;
+    if (feeOption == 2) {
+        principal += loanFee; // Roll fee into loan amount
     }
 
-    // Pool will automatically join threads upon destruction
+    // Calculate monthly payment
+    double monthlyPayment = loanService.calculateMonthlyPayment(principal, annualInterestRate, loanTermMonths);
+
+    // Output the results
+    std::cout << "Monthly Payment: $" << monthlyPayment << std::endl;
+
+    // Clean up
+    delete selectedLoanType;
+
     return 0;
 }

@@ -1,143 +1,90 @@
 #include <iostream>
-#include <string>
+#include <cmath>
 #include <vector>
-#include <random>
-#include <CommonCrypto/CommonCrypto.h>  // Include CommonCrypto for SHA-256
-using namespace std;
+#include <functional>
 
-// Function to initialize the s-box using a provided key
-vector<int> initializeSBox(vector<int> s, const vector<char>& key);
+class LoanService {
+public:
+    enum LoanType {
+        CAR_LOAN,
+        HOUSE_LOAN,
+        LOAN_TYPE_COUNT // To represent the number of loan types
+    };
 
-// Function to obfuscate the BVN (Bank Verification Number)
-string obfuscateBVN(vector<int> s, const vector<char>& key, const string& bvn);
+    // Type definition for loan fee calculation function
+    using LoanFeeCalcFunc = std::function<double(double)>;
 
-// Function to deobfuscate the BVN
-string deobfuscateBVN(vector<int> s, const vector<char>& key, const string& bvn);
+    LoanService() {
+        // Initialize the function pointer array with appropriate functions
+        loanFeeCalculators[CAR_LOAN] = [this](double loanAmount) { return loanAmount * 0.015; }; // 1.5% for car loans
+        loanFeeCalculators[HOUSE_LOAN] = [this](double loanAmount) { return loanAmount * 0.03; }; // 3% for house loans
+    }
 
-// Function to generate a random key of specified length
-vector<char> generateRandomKey(size_t length);
+    // Function pointer array for loan fee calculation
+    LoanFeeCalcFunc loanFeeCalculators[LOAN_TYPE_COUNT];
 
-// Function to compute SHA-256 hash
-string computeSHA256(const string& data);
+    // Function to calculate loan origination fee based on loan type and amount
+    double calculateLoanFee(LoanType loanType, double loanAmount) {
+        // Check for valid loan type
+        if (loanType < 0 || loanType >= LOAN_TYPE_COUNT) {
+            return 0.0; // Invalid loan type
+        }
+        return loanFeeCalculators[loanType](loanAmount);
+    }
+
+    // Function to calculate monthly payment
+    double calculateMonthlyPayment(double principal, double annualInterestRate, int loanTermMonths) {
+        if (loanTermMonths == 0) return 0.0; // Avoid division by zero
+        double monthlyInterestRate = annualInterestRate / 12 / 100; // Convert annual rate to monthly and percentage
+        if (monthlyInterestRate == 0) {
+            return principal / loanTermMonths; // Simple division if no interest
+        }
+        return (principal * monthlyInterestRate) / (1 - pow(1 + monthlyInterestRate, -loanTermMonths));
+    }
+};
 
 int main() {
-    string bvn = "1234567890123456";  // Example BVN
-    vector<int> S(256); // s-box initialization vector
+    LoanService loanService;
 
-    // Generate a random key of 16 bytes (128 bits)
-    vector<char> key = generateRandomKey(16);
+    double loanAmount, annualInterestRate;
+    int loanTermMonths;
+    int feeOption;
 
-    // Initialize the s-box with the key
-    S = initializeSBox(S, key);
+    std::cout << "Enter the amount of the loan: ";
+    std::cin >> loanAmount;
 
-    // Obfuscate the BVN
-    string obfuscatedBVN = obfuscateBVN(S, key, bvn);
+    std::cout << "Enter the annual interest rate (in %): ";
+    std::cin >> annualInterestRate;
 
-    // Compute the SHA-256 hash of the original BVN for integrity check
-    string originalHash = computeSHA256(bvn);
+    std::cout << "Enter the loan term (in months): ";
+    std::cin >> loanTermMonths;
 
-    // Deobfuscate the BVN
-    string deobfuscatedBVN = deobfuscateBVN(S, key, obfuscatedBVN);
-    
-    // Compute the SHA-256 hash of the deobfuscated BVN for integrity check
-    string deobfuscatedHash = computeSHA256(deobfuscatedBVN);
+    // Loan type selection
+    int loanType;
+    std::cout << "Select loan type:\n1. Car Loan\n2. House Loan\nChoose (1/2): ";
+    std::cin >> loanType;
 
-    // Verify integrity
-    if (originalHash == deobfuscatedHash) {
-        cout << "Integrity check passed. Data is intact." << endl;
-    } else {
-        cout << "Integrity check failed. Data may be tampered with!" << endl;
+    LoanService::LoanType selectedLoanType = 
+        (loanType == 1) ? LoanService::CAR_LOAN : LoanService::HOUSE_LOAN;
+
+    // Loan fee calculation
+    double loanFee = loanService.calculateLoanFee(selectedLoanType, loanAmount);
+    std::cout << "Loan Origination Fee: $" << loanFee << std::endl;
+
+    // Fee payment option
+    std::cout << "Do you want to pay the loan fee upfront or roll it into the loan?\n1. Pay upfront\n2. Roll into loan\nChoose (1/2): ";
+    std::cin >> feeOption;
+
+    double principal = loanAmount;
+    if (feeOption == 2) {
+        principal += loanFee; // Roll fee into loan amount
     }
 
-    // Print the results
-    cout << "Original BVN: " << bvn << endl;
-    cout << "Obfuscated BVN: " << obfuscatedBVN << endl;
-    cout << "Deobfuscated BVN: " << deobfuscatedBVN << endl;
+    // Calculate monthly payment
+    double monthlyPayment = loanService.calculateMonthlyPayment(principal, annualInterestRate, loanTermMonths);
+    
+    // Output the results
+    std::cout << "Monthly Payment: $" << monthlyPayment << std::endl;
 
     return 0;
-}
-
-vector<char> generateRandomKey(size_t length) {
-    vector<char> key(length);
-    random_device rd;  // Obtain a random number from hardware
-    mt19937 generator(rd()); // Seed the generator
-    uniform_int_distribution<> distribution(0, 255); // Define the range
-
-    for (size_t i = 0; i < length; ++i) {
-        key[i] = static_cast<char>(distribution(generator)); // Generate random byte
-    }
-    return key;
-}
-
-string computeSHA256(const string& data) {
-    unsigned char hash[CC_SHA256_DIGEST_LENGTH];
-    CC_SHA256(data.c_str(), static_cast<CC_LONG>(data.size()), hash);
-
-    string hashString;
-    for (int i = 0; i < CC_SHA256_DIGEST_LENGTH; i++) {
-        hashString += sprintf("%02x", hash[i]); // Convert to hex
-    }
-    return hashString;
-}
-
-string deobfuscateBVN(vector<int> s, const vector<char>& key, const string& bvn) {
-    int i = 0, j = 0, tmp = 0, k = 0;
-    int c;
-    string plain_T;
-
-    // Deobfuscation process
-    for (size_t r = 0; r < bvn.length(); r++) {
-        i = (i + 1) % 256;
-        j = (j + s[i]) % 256;
-
-        // Swap section
-        swap(s[i], s[j]);
-
-        int tmp_index = (s[i] + s[j]) % 256;
-        k = s[tmp_index];
-
-        c = (static_cast<int>(bvn[r]) ^ k);  // XOR with the generated key
-        plain_T += static_cast<char>(c);  // Convert int to char and append to output string
-    }
-    return plain_T;
-}
-
-string obfuscateBVN(vector<int> s, const vector<char>& key, const string& bvn) {
-    int i = 0, j = 0, tmp = 0, k = 0;
-    int c;
-    string cipher_T;
-
-    // Obfuscation process
-    for (size_t r = 0; r < bvn.length(); r++) {
-        i = (i + 1) % 256;
-        j = (j + s[i]) % 256;
-
-        // Swap section
-        swap(s[i], s[j]);
-
-        int tmp_index = (s[i] + s[j]) % 256;
-        k = s[tmp_index];
-
-        c = (static_cast<int>(bvn[r]) ^ k);  // XOR the BVN character with the key
-        cipher_T += static_cast<char>(c);  // Convert int to char and append to output string
-    }
-
-    return cipher_T;
-}
-
-vector<int> initializeSBox(vector<int> s, const vector<char>& key) {
-    int b = 0;
-
-    // Initialize the s-box with values from 0 to 255
-    for (int a = 0; a < 256; a++) {
-        s[a] = a;
-    }
-
-    // Perform the key scheduling to generate the s-box
-    for (int a = 0; a < 256; a++) {
-        b = (b + s[a] + key[a % key.size()]) % 256;
-        swap(s[a], s[b]);
-    }
-
-    return s;
 }
