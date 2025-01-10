@@ -96,8 +96,46 @@ bool is destination reached() const {
 };
 
 // Driver code to test above methods
+// Driver code to test above methods
 int main() {
     int rows, cols;
-    // Rest of the test code
 
+    // Get the dimensions of the grid from the user
+    cout << "Enter the number of rows: ";
+    cin >> rows;
+    cout << "Enter the number of columns: ";
+    cin >> cols;
+
+    // Create a dynamic 2D vector for the grid
+    vector<vector<int>> grid(rows, vector<int>(cols));
+
+    // Get the grid values from the user
+    cout << "Enter the grid values:" << endl;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            cin >> grid[i][j];
+        }
+    }
+
+    // Choice of container for Dijkstra's algorithm (set or priority_queue)
+    cout << "Choose container type: 1 for set, 2 for priority_queue: ";
+    int choice;
+    cin >> choice;
+
+    int minCost;
+    if (choice == 1) {
+        // Using set
+        minCost = shortest<set<Cell>>(grid, rows, cols);
+    } else {
+        // Using priority_queue
+        minCost = shortest<priority_queue<Cell, vector<Cell>, greater<Cell>>>(grid, rows, cols);
+    }
+
+    if (minCost != -1) {
+        cout << "The minimum cost to reach bottom-right from top-left is: " << minCost << endl;
+    } else {
+        cout << "Destination is not reachable." << endl;
+    }
+
+    return 0;
 }
