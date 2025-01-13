@@ -13,3 +13,9 @@ Include Non existent header:
     https://gist.github.com/Einstrasse/ac0fe7d7450621a39364ed3b05cacd11
 
 clang++ --std=c++20 model_a_3.cpp -o model_a_3.out -pedantic -D HOUSE_LOAN_FEE_PERCENTAGE=0.12 -D CAR_LOAN_FEE_PERCENTAGE=0.08
+
+
+clang++ --std=c++20 test_example.cpp -o test_example.out -pedantic -lgtest -lgtest_main
+
+clang++ --std=c++20 test_example.cpp -o test_example.out
+

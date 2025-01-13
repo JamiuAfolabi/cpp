@@ -3,7 +3,8 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/opt/homebrew/include/**"
             ],
             "defines": [],
             "macFrameworkPath": [
@@ -12,7 +13,8 @@
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c23",
             "cppStandard": "c++20",
-            "intelliSenseMode": "macos-clang-arm64"
+            "intelliSenseMode": "macos-clang-arm64",
+            "browse": {}
         }
     ],
     "version": 4

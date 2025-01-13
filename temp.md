@@ -13,3 +13,5 @@ The model successfully extended the code to include an hash verification functio
 100 113 174 11 33
 88 124 41 20 140
 99 32 111 41 20
+
+8 -8 9 -9 10 -11 12
