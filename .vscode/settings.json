@@ -71,6 +71,12 @@
         "valarray": "cpp",
         "memory": "cpp",
         "print": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "any": "cpp",
+        "codecvt": "cpp",
+        "source_location": "cpp",
+        "span": "cpp",
+        "strstream": "cpp",
+        "*.ipp": "cpp"
     }
 }

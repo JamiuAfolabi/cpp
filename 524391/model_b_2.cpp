@@ -19,6 +19,7 @@ struct LoanApplication {
         : applicantName(name), creditScore(score), employed(emp), annualIncome(income), loanAmount(amount) {}
 };
 
+
 class LoanProcessingSystem {
 private:
     priority_queue<LoanApplication, vector<LoanApplication>,

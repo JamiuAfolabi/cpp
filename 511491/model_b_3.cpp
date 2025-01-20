@@ -3,6 +3,8 @@
 #include <deque>
 #include <mutex>
 #include <condition_variable>
+#include <thread>
+#include <chrono>
 
 template<typename K, typename V>
 class Cache {
@@ -70,3 +72,51 @@ private:
     std::condition_variable cacheFullCV;
     bool atCapacity = false;
 };
+
+int main() {
+    Cache<int, std::string> cache(3); // Create a cache with max size of 3
+
+    // Start a few threads to simulate concurrent cache operations
+    std::thread producer1([&]() {
+        cache.put(1, "Value 1");
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        cache.put(2, "Value 2");
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        cache.put(3, "Value 3");
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        cache.put(4, "Value 4");
+    });
+
+    std::thread producer2([&]() {
+        cache.put(5, "Value 5");
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        cache.put(6, "Value 6");
+    });
+
+    std::thread consumer([&]() {
+        std::string value;
+        if (cache.get(1, value)) {
+            std::cout << "Retrieved Key 1: " << value << std::endl;
+        }
+        if (cache.get(2, value)) {
+            std::cout << "Retrieved Key 2: " << value << std::endl;
+        }
+        if (cache.get(3, value)) {
+            std::cout << "Retrieved Key 3: " << value << std::endl;
+        }
+        if (cache.get(4, value)) {
+            std::cout << "Retrieved Key 4: " << value << std::endl;
+        }
+    });
+
+    // Wait for threads to finish
+    producer1.join();
+    producer2.join();
+    consumer.join();
+
+    // Print the final cache content
+    std::cout << "\nFinal Cache State:" << std::endl;
+    cache.printCache();
+
+    return 0;
+}

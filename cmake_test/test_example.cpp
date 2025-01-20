@@ -1,20 +1,34 @@
-// CPP Program to demonstrate Arbitrary precision data type
-#include <boost/multiprecision/cpp_int.hpp>
-using namespace boost::multiprecision;
-using namespace std;
+#include <boost/algorithm/string.hpp> 
+#include <iostream> 
 
-cpp_int boost_factorial(int num)
-{
-	cpp_int fact = 1;
-	for (int i = num; i > 1; --i)
-		fact *= i;
-	return fact;
-}
+using namespace std; 
+using namespace boost::algorithm; 
 
-int main()
-{
-	int num = 30;
-	cout << "Factorial of " << num << " = "
-		<< boost_factorial(num);
-	return 0;
-}
+int main() 
+{ 
+	string str("Hello"); 
+	string upper_s; 
+	string lower_s; 
+
+	cout << "Actual string: "
+		<< str << endl; 
+
+	to_upper(str); 
+	cout << "Actual string converted to uppercase: "
+		<< str << endl; 
+
+	to_lower(str); 
+	cout << "Actual string converted to lowercase: "
+		<< str << endl; 
+
+	str = "Hello"; 
+	upper_s = to_upper_copy(str); 
+	lower_s = to_lower_copy(str); 
+
+	cout << "Converted Uppercase string: "
+		<< upper_s << endl; 
+	cout << "Converted Lowercase string: "
+		<< lower_s << endl; 
+
+	return 0; 
+} 
