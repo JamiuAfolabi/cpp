@@ -16,109 +16,103 @@ private:
 public:
     CustomerLoans(int initialCustomers) : numCustomers(initialCustomers) {
         try {
+            // Allocate array of pointers to Loan arrays
             customers = new Loan*[numCustomers];
-            loansPerCustomer = new int[numCustomers];
+            // Allocate array to track number of loans per customer
+            loansPerCustomer = new int[numCustomers]();  // Initialize to 0
             
-            // Initialize using pointer arithmetic
-            Loan** custPtr = customers;
-            int* loanCountPtr = loansPerCustomer;
+            // Initialize all customer pointers to nullptr
             for(int i = 0; i < numCustomers; i++) {
-                *custPtr++ = nullptr;
-                *loanCountPtr++ = 0;
+                customers[i] = nullptr;
             }
         } catch (const std::bad_alloc& e) {
+            // Clean up any allocated memory before rethrowing
             delete[] customers;
             delete[] loansPerCustomer;
             throw std::runtime_error("Memory allocation failed during initialization");
         }
     }
     
+    // Add loans for a specific customer
     void addLoansForCustomer(int customerId, Loan* loans, int numLoans) {
         if (customerId < 0 || customerId >= numCustomers) {
             throw std::out_of_range("Invalid customer ID");
         }
         
         try {
+            // Allocate new array for customer's loans
             Loan* customerLoans = new Loan[numLoans];
             
-            // Copy loans using pure pointer arithmetic
+            // Copy loans using pointer arithmetic
             Loan* dest = customerLoans;
             Loan* src = loans;
-            Loan* const end = src + numLoans;
-            
-            while(src < end) {
+            for(int i = 0; i < numLoans; i++) {
                 *dest++ = *src++;
             }
             
-            // Free existing loans if any using pointer arithmetic
-            Loan** customerPtr = customers + customerId;
-            if (*customerPtr != nullptr) {
-                delete[] *customerPtr;
+            // Delete existing loans if any
+            if (customers[customerId] != nullptr) {
+                delete[] customers[customerId];
             }
             
-            *customerPtr = customerLoans;
-            *(loansPerCustomer + customerId) = numLoans;
+            // Update customer's loans
+            customers[customerId] = customerLoans;
+            loansPerCustomer[customerId] = numLoans;
             
         } catch (const std::bad_alloc& e) {
             throw std::runtime_error("Memory allocation failed while adding loans");
         }
     }
     
+    // Get pointer to loans for a specific customer
     Loan* getCustomerLoans(int customerId, int& numLoans) {
         if (customerId < 0 || customerId >= numCustomers) {
             throw std::out_of_range("Invalid customer ID");
         }
         
-        numLoans = *(loansPerCustomer + customerId);
-        return *(customers + customerId);
+        numLoans = loansPerCustomer[customerId];
+        return customers[customerId];
     }
     
+    // Print all loans for debugging
     void printAllLoans() {
-        Loan** custPtr = customers;
-        int* loanCountPtr = loansPerCustomer;
-        
-        for(int i = 0; i < numCustomers; i++, custPtr++, loanCountPtr++) {
+        for(int i = 0; i < numCustomers; i++) {
             std::cout << "Customer " << i << " loans:\n";
-            if (*custPtr == nullptr) {
+            if (customers[i] == nullptr) {
                 std::cout << "  No loans\n";
                 continue;
             }
             
-            // Use pointer arithmetic to iterate through loans
-            Loan* loanPtr = *custPtr;
-            Loan* const endPtr = loanPtr + *loanCountPtr;
-            
-            int loanIndex = 0;
-            while(loanPtr < endPtr) {
-                std::cout << "  Loan " << loanIndex++ << ": "
-                         << "Amount=" << loanPtr->amount
-                         << ", Rate=" << loanPtr->interestRate
-                         << ", Term=" << loanPtr->termMonths << " months\n";
-                loanPtr++;
+            Loan* customerLoans = customers[i];
+            for(int j = 0; j < loansPerCustomer[i]; j++) {
+                std::cout << "  Loan " << j << ": Amount=" << customerLoans[j].amount
+                         << ", Rate=" << customerLoans[j].interestRate
+                         << ", Term=" << customerLoans[j].termMonths << " months\n";
             }
         }
     }
     
     ~CustomerLoans() {
-        Loan** custPtr = customers;
+        // Clean up all allocated memory
         for(int i = 0; i < numCustomers; i++) {
-            delete[] *custPtr++;
+            delete[] customers[i];
         }
         delete[] customers;
         delete[] loansPerCustomer;
     }
 };
 
+// Example usage
 int main() {
     try {
         CustomerLoans loanSystem(3);  // System with 3 customers
         
         // Add loans for customer 0
-        Loan initialLoans[] = {
+        Loan customer0Loans[] = {
             {10000, 5.5, 36},
             {5000, 4.5, 24}
         };
-        loanSystem.addLoansForCustomer(0, initialLoans, 2);
+        loanSystem.addLoansForCustomer(0, customer0Loans, 2);
         
         // Add loan for customer 1
         Loan customer1Loans[] = {
@@ -126,13 +120,13 @@ int main() {
         };
         loanSystem.addLoansForCustomer(1, customer1Loans, 1);
         
+        // Print all loans
         loanSystem.printAllLoans();
         
-        // Access loans using pointer arithmetic
+        // Access loans for a specific customer
         int numLoans;
-        Loan* retrievedLoans = loanSystem.getCustomerLoans(0, numLoans);
-        Loan* firstLoan = retrievedLoans;
-        std::cout << "\nFirst loan amount for customer 0: " << firstLoan->amount << std::endl;
+        Loan* customer0LoanPtr = loanSystem.getCustomerLoans(0, numLoans);
+        std::cout << "\nFirst loan amount for customer 0: " << customer0LoanPtr->amount << std::endl;
         
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
