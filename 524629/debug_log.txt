@@ -1,0 +1,22 @@
+DEBUG: Created patient Child with ID P1
+DEBUG: Created patient Parent1 with ID P2
+DEBUG: Created patient Parent2 with ID P3
+DEBUG: Created patient Grandparent with ID P4
+DEBUG: Serializing patient Child (ID: P1)
+DEBUG: Serializing patient Parent1 (ID: P2)
+DEBUG: Serializing patient Grandparent (ID: P4)
+DEBUG: Cycle detected at patient Child (ID: P1)
+DEBUG: Serializing patient Parent2 (ID: P3)
+DEBUG: Deserializing patient Child (ID: P1) with 2 parents
+DEBUG: Created patient Child with ID P1
+DEBUG: Deserializing patient Parent1 (ID: P2) with 1 parents
+DEBUG: Created patient Parent1 with ID P2
+DEBUG: Deserializing patient Grandparent (ID: P4) with 1 parents
+DEBUG: Created patient Grandparent with ID P4
+DEBUG: Encountered cycle reference to ID: P1
+DEBUG: Added parent relationship: Child -> Grandparent
+DEBUG: Added parent relationship: Grandparent -> Parent1
+DEBUG: Added parent relationship: Parent1 -> Child
+DEBUG: Deserializing patient Parent2 (ID: P3) with 0 parents
+DEBUG: Created patient Parent2 with ID P3
+DEBUG: Added parent relationship: Parent2 -> Child
