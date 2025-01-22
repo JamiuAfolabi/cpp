@@ -1,0 +1,140 @@
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: Hello, this is an urgent message!
+Wed Jan 22 14:04:20 2025
+: Created StringHandler with message from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: Just some information for you
+Wed Jan 22 14:04:20 2025
+: Created StringHandler with message from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: This is a general message
+Wed Jan 22 14:04:20 2025
+: Created StringHandler with message from sender: Sender3
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: Hello, this is an urgent message!
+Wed Jan 22 14:04:20 2025
+: Copied StringHandler from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Added message to history
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: Just some information for you
+Wed Jan 22 14:04:20 2025
+: Copied StringHandler from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Moved StringHandler from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: 
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: 
+Wed Jan 22 14:04:20 2025
+: Added message to history
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: This is a general message
+Wed Jan 22 14:04:20 2025
+: Copied StringHandler from sender: Sender3
+Wed Jan 22 14:04:20 2025
+: Moved StringHandler from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Moved StringHandler from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: 
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: 
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: 
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: 
+Wed Jan 22 14:04:20 2025
+: Added message to history
+Wed Jan 22 14:04:20 2025
+: Displayed all messages
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: Hello, this is an urgent message!
+Wed Jan 22 14:04:20 2025
+: Copied StringHandler from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Searched for messages with keyword: urgent
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: Hello, this is an urgent message!
+Wed Jan 22 14:04:20 2025
+: Copied StringHandler from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: Just some information for you
+Wed Jan 22 14:04:20 2025
+: Copied StringHandler from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Allocated memory for message: This is a general message
+Wed Jan 22 14:04:20 2025
+: Copied StringHandler from sender: Sender3
+Wed Jan 22 14:04:20 2025
+: Categorized messages into 3 categories
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender3
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender3
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender3
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender3
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender3
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender3
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender2
+Wed Jan 22 14:04:20 2025
+: Destroyed StringHandler from sender: Sender1
+Wed Jan 22 14:04:20 2025
+: Deallocated memory for message from sender: Sender1
+Wed Jan 22 14:19:33 2025
+: Allocated memory for message: Hello, this is an urgent message!
+Wed Jan 22 14:19:33 2025
+: Created StringHandler with message from sender: Sender1
+Wed Jan 22 14:19:33 2025
+: Allocated memory for message: Just some information for you
+Wed Jan 22 14:19:33 2025
+: Created StringHandler with message from sender: Sender2
+Wed Jan 22 14:19:33 2025
+: Allocated memory for message: This is a general message
+Wed Jan 22 14:19:33 2025
+: Created StringHandler with message from sender: Sender3
+Wed Jan 22 14:19:33 2025
+: Added message to history
+Wed Jan 22 14:19:33 2025
+: Added message to history
+Wed Jan 22 14:19:33 2025
+: Added message to history
+Wed Jan 22 14:19:33 2025
+: Displayed all messages
+Wed Jan 22 14:19:33 2025
+: Searched for messages with keyword: urgent
+Wed Jan 22 14:19:33 2025
+: Categorized messages into 3 categories
+Wed Jan 22 14:19:33 2025
+: Destroyed StringHandler from sender: Sender3
+Wed Jan 22 14:19:33 2025
+: Destroyed StringHandler from sender: Sender2
+Wed Jan 22 14:19:33 2025
+: Destroyed StringHandler from sender: Sender1
