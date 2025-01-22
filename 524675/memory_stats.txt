@@ -1,0 +1,8 @@
+
+=== Detailed Memory Usage Statistics ===
+
+=== Overall Memory Statistics ===
+Total memory allocated: 0 bytes
+Peak memory usage: 0 bytes
+Current memory usage: 0 bytes
+
