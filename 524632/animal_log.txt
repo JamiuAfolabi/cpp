@@ -1,0 +1,94 @@
+
+=== Simulation Step 0 ===
+
+
+=== Simulation Step 1 ===
+
+
+=== Simulation Step 2 ===
+
+
+=== Simulation Step 3 ===
+
+
+=== Simulation Step 4 ===
+
+
+=== Simulation Step 5 ===
+
+
+=== Simulation Step 6 ===
+
+
+=== Simulation Step 7 ===
+
+!!! PREDATOR-PREY CONFLICT: %s spotted %s at (%d,%d)!!!
+
+
+=== Simulation Step 8 ===
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 9 ===
+
+INTERACTION: %s encountered %s at (%d,%d)
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+!!! PREDATOR-PREY CONFLICT: %s spotted %s at (%d,%d)!!!
+
+
+=== Simulation Step 10 ===
+
+INTERACTION: %s encountered %s at (%d,%d)
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 11 ===
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 12 ===
+
+INTERACTION: %s encountered %s at (%d,%d)
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 13 ===
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 14 ===
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 15 ===
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 16 ===
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 17 ===
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 18 ===
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+
+
+=== Simulation Step 19 ===
+
+[%s] Movement: (%d,%d) -> (%d,%d)
+

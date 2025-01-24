@@ -1,0 +1,79 @@
+
+=== Simulation Step 0 ===
+
+=== Simulation Step 1 ===
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Elephant at (17,14)!!!
+
+=== Simulation Step 2 ===
+[Tiger] Movement: (17,14) -> (16,15)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Elephant at (16,15)!!!
+
+=== Simulation Step 3 ===
+[Tiger] Movement: (16,15) -> (16,16)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Elephant at (16,16)!!!
+
+=== Simulation Step 4 ===
+[Tiger] Movement: (16,16) -> (16,17)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Elephant at (16,17)!!!
+
+=== Simulation Step 5 ===
+INTERACTION: Elephant encountered Tiger at (15,16)
+[Tiger] Movement: (16,17) -> (15,17)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Elephant at (15,17)!!!
+
+=== Simulation Step 6 ===
+INTERACTION: Elephant encountered Tiger at (16,16)
+[Tiger] Movement: (15,17) -> (15,16)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Elephant at (15,16)!!!
+
+=== Simulation Step 7 ===
+INTERACTION: Elephant encountered Tiger at (17,16)
+[Tiger] Movement: (15,16) -> (15,15)
+
+=== Simulation Step 8 ===
+INTERACTION: Elephant encountered Tiger at (16,16)
+[Tiger] Movement: (15,15) -> (15,15)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Elephant at (15,15)!!!
+
+=== Simulation Step 9 ===
+INTERACTION: Elephant encountered Tiger at (16,16)
+[Tiger] Movement: (15,15) -> (14,15)
+
+=== Simulation Step 10 ===
+INTERACTION: Elephant encountered Tiger at (15,16)
+[Tiger] Movement: (14,15) -> (14,15)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Elephant at (14,15)!!!
+
+=== Simulation Step 11 ===
+INTERACTION: Elephant encountered Tiger at (15,15)
+[Tiger] Movement: (14,15) -> (14,16)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Elephant at (14,16)!!!
+
+=== Simulation Step 12 ===
+[Tiger] Movement: (14,16) -> (14,16)
+
+=== Simulation Step 13 ===
+[Tiger] Movement: (14,16) -> (13,16)
+
+=== Simulation Step 14 ===
+[Tiger] Movement: (13,16) -> (12,17)
+
+=== Simulation Step 15 ===
+[Tiger] Movement: (12,17) -> (13,17)
+
+=== Simulation Step 16 ===
+[Tiger] Movement: (13,17) -> (12,16)
+
+=== Simulation Step 17 ===
+[Tiger] Movement: (12,16) -> (12,15)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Zebra at (12,15)!!!
+
+=== Simulation Step 18 ===
+INTERACTION: Zebra encountered Tiger at (11,16)
+[Tiger] Movement: (12,15) -> (11,16)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Zebra at (11,16)!!!
+
+=== Simulation Step 19 ===
+INTERACTION: Zebra encountered Tiger at (12,16)
+[Tiger] Movement: (11,16) -> (12,16)
+!!! PREDATOR-PREY CONFLICT: Tiger spotted Zebra at (12,16)!!!
