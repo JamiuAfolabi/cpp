@@ -1,0 +1,4 @@
+Fri Jan 24 12:24:03 2025
+ - Service: Dine-In has been enabled
+Fri Jan 24 12:24:10 2025
+ - Service: Takeaway has been disabled
